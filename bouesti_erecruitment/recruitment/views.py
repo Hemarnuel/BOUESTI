@@ -294,6 +294,42 @@ def notifications_view(request):
 def admin_user_list_view(request):
     users = User.objects.all().order_by("-created_at")
     return render(request, "recruitment/admin_user_list.html", {"users": users})
+    
+def build_admin_context():
+    return {
+        "stats": {
+            "total_users": User.objects.count(),
+            "total_recruiters": User.objects.filter(role=User.Role.RECRUITER).count(),
+            "approved_recruiters": User.objects.filter(
+                role=User.Role.RECRUITER,
+                recruiter_approval=User.RecruiterApproval.APPROVED,
+            ).count(),
+            "pending_recruiters": User.objects.filter(
+                role=User.Role.RECRUITER,
+                recruiter_approval=User.RecruiterApproval.PENDING,
+            ).count(),
+            "total_applicants": User.objects.filter(role=User.Role.APPLICANT).count(),
+            "total_jobs": Job.objects.count(),
+            "open_jobs": Job.objects.filter(status=Job.Status.OPEN).count(),
+            "total_applications": Application.objects.count(),
+            "hired": Application.objects.filter(status=Application.Status.HIRED).count(),
+        },
+        "recent_users": User.objects.order_by("-created_at")[:8],
+        "recent_jobs": Job.objects.order_by("-created_at")[:8],
+    }
+
+
+def admin_dashboard(request):
+    """Implements 3.3.1: manage users, monitor recruitment activities, generate reports."""
+    return render(request, "recruitment/dashboard_admin.html", build_admin_context())
+
+
+@role_required(User.Role.ADMIN)
+def super_admin_dashboard(request):
+    """Dedicated dashboard for the super admin with a full operational overview."""
+    context = build_admin_context()
+    context["stats"]["is_super_admin"] = True
+    return render(request, "recruitment/dashboard_super_admin.html", context)
 
 
 @role_required(User.Role.ADMIN)
