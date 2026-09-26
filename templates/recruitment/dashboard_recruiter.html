@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Recruiter Dashboard{% endblock %}
+{% block content %}
+
+<h3 class="mb-4">Welcome, {{ user.first_name|default:user.username }} <span class="badge bg-primary">Recruiter</span></h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card p-3 text-center">
+            <h2>{{ stats.total_jobs }}</h2>
+            <p class="text-muted mb-0">Jobs Posted</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card p-3 text-center">
+            <h2>{{ stats.open_jobs }}</h2>
+            <p class="text-muted mb-0">Open Vacancies</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card p-3 text-center">
+            <h2>{{ stats.total_applications }}</h2>
+            <p class="text-muted mb-0">Total Applications Received</p>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">My Job Vacancies</h5>
+    <a href="{% url 'recruitment:job_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Post New Job</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white shadow-sm rounded">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Deadline</th>
+                <th>Applications</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job.title }}</td>
+                <td>{{ job.department }}</td>
+                <td>
+                    <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ job.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ job.deadline }}</td>
+                <td><a href="{% url 'recruitment:job_applications' job.pk %}" class="badge bg-info text-decoration-none">{{ job.application_count }} received</a></td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'recruitment:job_update' job.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="post" action="{% url 'recruitment:job_delete' job.pk %}" data-confirm="Delete this job vacancy? This cannot be undone.">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">You haven't posted any jobs yet. <a href="{% url 'recruitment:job_create' %}">Post your first vacancy</a>.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

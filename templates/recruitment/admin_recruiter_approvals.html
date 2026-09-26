@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Recruiter Approvals{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-1">Recruiter Verification</h3>
+        <p class="text-muted mb-0">Review each recruiter account before granting access.</p>
+    </div>
+    <a href="{% url 'recruitment:dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white shadow-sm rounded">
+        <thead class="table-light">
+            <tr>
+                <th>Applicant</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Registered</th>
+                <th>Review decision</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recruiter in pending_recruiters %}
+            <tr>
+                <td>{{ recruiter.get_full_name|default:recruiter.username }}<br><small class="text-muted">@{{ recruiter.username }}</small></td>
+                <td>{{ recruiter.email|default:"Not provided" }}</td>
+                <td>{{ recruiter.phone_number|default:"Not provided" }}</td>
+                <td>{{ recruiter.created_at|date:"d M Y, H:i" }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <form method="post" action="{% url 'recruitment:admin_review_recruiter' recruiter.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="decision" value="approved">
+                            <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                        </form>
+                        <form method="post" action="{% url 'recruitment:admin_review_recruiter' recruiter.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="decision" value="rejected">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No recruiter accounts are waiting for review.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

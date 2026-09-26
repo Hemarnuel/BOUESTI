@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Recruitment Reports{% endblock %}
+{% block content %}
+
+<h3 class="mb-4">Recruitment Reports</h3>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold">Jobs by Department</div>
+            <ul class="list-group list-group-flush">
+                {% for row in jobs_by_department %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ row.department }}</span>
+                    <span class="badge bg-primary">{{ row.total }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted">No data yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold">Applications by Status</div>
+            <ul class="list-group list-group-flush">
+                {% for row in applications_by_status %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="badge badge-status-{{ row.status }}">{{ row.status }}</span>
+                    <span class="badge bg-primary">{{ row.total }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted">No data yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold">Top 10 Jobs by Applications</div>
+            <ul class="list-group list-group-flush">
+                {% for job in top_jobs %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <a href="{% url 'recruitment:job_detail' job.pk %}">{{ job.title }}</a>
+                    <span class="badge bg-primary">{{ job.application_count }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted">No data yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
