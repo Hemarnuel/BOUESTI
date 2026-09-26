@@ -25,9 +25,15 @@
                 <td>{{ u.email }}</td>
                 <td><span class="badge bg-secondary">{{ u.get_role_display }}</span></td>
                 <td>
-                    <span class="badge {% if u.is_active %}bg-success{% else %}bg-danger{% endif %}">
-                        {% if u.is_active %}Active{% else %}Deactivated{% endif %}
-                    </span>
+                    {% if u.is_recruiter_role %}
+                        <span class="badge {% if u.recruiter_approval == 'approved' %}bg-success{% elif u.recruiter_approval == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                            {{ u.get_recruiter_approval_display }}
+                        </span>
+                    {% else %}
+                        <span class="badge {% if u.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if u.is_active %}Active{% else %}Deactivated{% endif %}
+                        </span>
+                    {% endif %}
                 </td>
                 <td>{{ u.created_at|date:"d M Y" }}</td>
                 <td>

@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from accounts.models import User
 
@@ -66,6 +67,9 @@ def dashboard_view(request):
     if user.is_admin_role():
         return admin_dashboard(request)
     if user.is_recruiter_role():
+        if user.recruiter_approval != User.RecruiterApproval.APPROVED:
+            messages.error(request, "Your recruiter account is awaiting administrator approval.")
+            return redirect("recruitment:home")
         return recruiter_dashboard(request)
     return applicant_dashboard(request)
 
@@ -107,6 +111,10 @@ def admin_dashboard(request):
         "stats": {
             "total_users": User.objects.count(),
             "total_recruiters": User.objects.filter(role=User.Role.RECRUITER).count(),
+            "pending_recruiters": User.objects.filter(
+                role=User.Role.RECRUITER,
+                recruiter_approval=User.RecruiterApproval.PENDING,
+            ).count(),
             "total_applicants": User.objects.filter(role=User.Role.APPLICANT).count(),
             "total_jobs": Job.objects.count(),
             "open_jobs": Job.objects.filter(status=Job.Status.OPEN).count(),
@@ -292,10 +300,61 @@ def admin_user_list_view(request):
 def admin_toggle_user_active_view(request, pk):
     target = get_object_or_404(User, pk=pk)
     if request.method == "POST" and target != request.user:
+        if (
+            target.role == User.Role.RECRUITER
+            and target.recruiter_approval != User.RecruiterApproval.APPROVED
+            and not target.is_active
+        ):
+            messages.error(request, "A recruiter must be approved before their account can be activated.")
+            return redirect("recruitment:admin_users")
         target.is_active = not target.is_active
         target.save()
         messages.success(request, f"{target.username} is now {'active' if target.is_active else 'deactivated'}.")
     return redirect("recruitment:admin_users")
+
+
+@role_required(User.Role.ADMIN)
+def admin_recruiter_approvals_view(request):
+    pending_recruiters = User.objects.filter(
+        role=User.Role.RECRUITER,
+        recruiter_approval=User.RecruiterApproval.PENDING,
+    ).order_by("created_at")
+    return render(
+        request,
+        "recruitment/admin_recruiter_approvals.html",
+        {"pending_recruiters": pending_recruiters},
+    )
+
+
+@role_required(User.Role.ADMIN)
+@require_POST
+def admin_review_recruiter_view(request, pk):
+    recruiter = get_object_or_404(
+        User,
+        pk=pk,
+        role=User.Role.RECRUITER,
+        recruiter_approval=User.RecruiterApproval.PENDING,
+    )
+    decision = request.POST.get("decision")
+    if decision not in (User.RecruiterApproval.APPROVED, User.RecruiterApproval.REJECTED):
+        messages.error(request, "Choose approve or reject to complete the review.")
+        return redirect("recruitment:admin_recruiter_approvals")
+
+    recruiter.recruiter_approval = decision
+    recruiter.recruiter_reviewed_by = request.user
+    recruiter.recruiter_reviewed_at = timezone.now()
+    recruiter.is_active = decision == User.RecruiterApproval.APPROVED
+    recruiter.save(
+        update_fields=[
+            "recruiter_approval",
+            "recruiter_reviewed_by",
+            "recruiter_reviewed_at",
+            "is_active",
+        ]
+    )
+    verb = "approved" if decision == User.RecruiterApproval.APPROVED else "rejected"
+    messages.success(request, f"Recruiter account for {recruiter.username} was {verb}.")
+    return redirect("recruitment:admin_recruiter_approvals")
 
 
 @role_required(User.Role.ADMIN)

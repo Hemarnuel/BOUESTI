@@ -19,9 +19,27 @@ class User(AbstractUser):
         RECRUITER = "recruiter", "Recruiter"
         APPLICANT = "applicant", "Job Applicant"
 
+    class RecruiterApproval(models.TextChoices):
+        PENDING = "pending", "Pending review"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.APPLICANT)
     phone_number = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    recruiter_approval = models.CharField(
+        max_length=20,
+        choices=RecruiterApproval.choices,
+        default=RecruiterApproval.APPROVED,
+    )
+    recruiter_reviewed_by = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="reviewed_recruiters",
+    )
+    recruiter_reviewed_at = models.DateTimeField(null=True, blank=True)
 
     def is_admin_role(self):
         return self.role == self.Role.ADMIN

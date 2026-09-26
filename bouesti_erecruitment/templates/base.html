@@ -30,6 +30,7 @@
                     {% endif %}
                     {% if user.is_admin_role %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:admin_users' %}">Manage Users</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:admin_recruiter_approvals' %}">Recruiter Approvals</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:admin_reports' %}">Reports</a></li>
                     {% endif %}
                 {% endif %}

@@ -46,6 +46,9 @@ class SignUpForm(UserCreationForm):
         user.last_name = self.cleaned_data["last_name"]
         user.phone_number = self.cleaned_data.get("phone_number", "")
         user.role = self.cleaned_data["role"]
+        if user.role == User.Role.RECRUITER:
+            user.recruiter_approval = User.RecruiterApproval.PENDING
+            user.is_active = False
         if commit:
             user.save()
         return user

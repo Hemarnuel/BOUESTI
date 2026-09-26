@@ -29,5 +29,7 @@ urlpatterns = [
     # Admin
     path("admin-panel/users/", views.admin_user_list_view, name="admin_users"),
     path("admin-panel/users/<int:pk>/toggle/", views.admin_toggle_user_active_view, name="admin_toggle_user"),
+    path("admin-panel/recruiters/", views.admin_recruiter_approvals_view, name="admin_recruiter_approvals"),
+    path("admin-panel/recruiters/<int:pk>/review/", views.admin_review_recruiter_view, name="admin_review_recruiter"),
     path("admin-panel/reports/", views.admin_reports_view, name="admin_reports"),
 ]

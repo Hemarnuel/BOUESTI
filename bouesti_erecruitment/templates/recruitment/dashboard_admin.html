@@ -48,6 +48,7 @@
 
 <div class="mb-3">
     <a href="{% url 'recruitment:admin_users' %}" class="btn btn-primary btn-sm">Manage Users</a>
+    <a href="{% url 'recruitment:admin_recruiter_approvals' %}" class="btn btn-outline-primary btn-sm">Review Recruiters <span class="badge bg-danger">{{ stats.pending_recruiters }}</span></a>
     <a href="{% url 'recruitment:admin_reports' %}" class="btn btn-outline-primary btn-sm">View Reports</a>
     <a href="/admin/" class="btn btn-outline-secondary btn-sm">Django Admin Panel</a>
 </div>
