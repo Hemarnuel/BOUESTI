@@ -25,10 +25,13 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:job_list' %}">Browse Jobs</a></li>
                 {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:dashboard' %}">Dashboard</a></li>
+                    {% if user.is_superuser %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:super_admin_dashboard' %}">Super Admin</a></li>
+                    {% endif %}
                     {% if user.is_recruiter_role %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:job_create' %}">Post a Job</a></li>
                     {% endif %}
-                    {% if user.is_admin_role %}
+                    {% if user.is_admin_role or user.is_superuser %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:admin_users' %}">Manage Users</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:admin_recruiter_approvals' %}">Recruiter Approvals</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'recruitment:admin_reports' %}">Reports</a></li>

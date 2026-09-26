@@ -42,7 +42,7 @@ class User(AbstractUser):
     recruiter_reviewed_at = models.DateTimeField(null=True, blank=True)
 
     def is_admin_role(self):
-        return self.role == self.Role.ADMIN
+        return self.is_superuser or self.role == self.Role.ADMIN
 
     def is_recruiter_role(self):
         return self.role == self.Role.RECRUITER

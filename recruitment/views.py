@@ -64,6 +64,8 @@ def job_detail_view(request, pk):
 @login_required
 def dashboard_view(request):
     user = request.user
+    if user.is_superuser:
+        return super_admin_dashboard(request)
     if user.is_admin_role():
         return admin_dashboard(request)
     if user.is_recruiter_role():
@@ -111,6 +113,10 @@ def admin_dashboard(request):
         "stats": {
             "total_users": User.objects.count(),
             "total_recruiters": User.objects.filter(role=User.Role.RECRUITER).count(),
+            "approved_recruiters": User.objects.filter(
+                role=User.Role.RECRUITER,
+                recruiter_approval=User.RecruiterApproval.APPROVED,
+            ).count(),
             "pending_recruiters": User.objects.filter(
                 role=User.Role.RECRUITER,
                 recruiter_approval=User.RecruiterApproval.PENDING,
@@ -125,6 +131,14 @@ def admin_dashboard(request):
         "recent_jobs": Job.objects.order_by("-created_at")[:8],
     }
     return render(request, "recruitment/dashboard_admin.html", context)
+
+
+@role_required(User.Role.ADMIN)
+def super_admin_dashboard(request):
+    """Dedicated dashboard for the super admin with a full operational overview."""
+    context = admin_dashboard.__wrapped__(request) if hasattr(admin_dashboard, "__wrapped__") else admin_dashboard(request)
+    context["stats"]["is_super_admin"] = True
+    return render(request, "recruitment/dashboard_super_admin.html", context)
 
 
 # ---------------------------------------------------------------------------

@@ -129,3 +129,18 @@ class RecruiterApprovalTests(TestCase):
 		recruiter.refresh_from_db()
 		self.assertFalse(recruiter.is_active)
 		self.assertEqual(recruiter.recruiter_approval, User.RecruiterApproval.PENDING)
+
+	def test_superuser_can_view_admin_dashboard_with_role_counts(self):
+		superadmin = User.objects.create_superuser(
+			username="superadmin",
+			email="superadmin@example.com",
+			password="Super-pass-12345",
+		)
+		self.client.force_login(superadmin)
+
+		response = self.client.get(reverse("recruitment:dashboard"))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "Recruiters")
+		self.assertContains(response, "Job Applicants")
+		self.assertContains(response, "Manage Users")

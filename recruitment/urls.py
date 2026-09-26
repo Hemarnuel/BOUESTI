@@ -7,6 +7,7 @@ app_name = "recruitment"
 urlpatterns = [
     path("", views.home_view, name="home"),
     path("dashboard/", views.dashboard_view, name="dashboard"),
+    path("super-admin/", views.super_admin_dashboard, name="super_admin_dashboard"),
 
     # Jobs
     path("jobs/", views.job_list_view, name="job_list"),

@@ -18,6 +18,8 @@ def role_required(*roles):
         @wraps(view_func)
         @login_required
         def _wrapped(request, *args, **kwargs):
+            if request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
             if (
                 request.user.is_recruiter_role()
                 and request.user.recruiter_approval != User.RecruiterApproval.APPROVED
