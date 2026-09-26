@@ -32,14 +32,10 @@ SECRET_KEY = os.environ.get(
 DEBUG = env_bool("DJANGO_DEBUG", "True")
 
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,bousti.onrender.com"
-    ).split(",")
-    if host.strip()
+    "bousti.onrender.com",
+    "localhost",
+    "127.0.0.1",
 ]
-
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
 
 
