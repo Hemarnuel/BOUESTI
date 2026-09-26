@@ -32,7 +32,7 @@ SECRET_KEY = os.environ.get(
 DEBUG = env_bool("DJANGO_DEBUG", "True")
 
 ALLOWED_HOSTS = [
-    "bousti.onrender.com",
+    "https://bousti.onrender.com/",
     "localhost",
     "127.0.0.1",
 ]
