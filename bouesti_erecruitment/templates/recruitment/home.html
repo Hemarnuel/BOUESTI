@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}BOUESTI E-Recruitment System{% endblock %}
+{% block content %}
+
+<div class="hero text-center">
+    <h1 class="display-5">BOUESTI E-Recruitment System</h1>
+    <p class="lead">A centralized platform for publishing vacancies, submitting applications, and tracking recruitment &mdash; built for Bamidele Olumilua University of Education, Science and Technology.</p>
+    <a href="{% url 'recruitment:job_list' %}" class="btn btn-light btn-lg text-primary fw-semibold me-2">Browse Vacancies</a>
+    {% if not user.is_authenticated %}
+        <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg">Get Started</a>
+    {% endif %}
+</div>
+
+<h4 class="mb-3">Latest Vacancies</h4>
+<div class="row g-3">
+    {% for job in latest_jobs %}
+        <div class="col-md-4">
+            <div class="card job-card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ job.title }}</h5>
+                    <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.department }} &middot; <i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+                    <span class="badge bg-secondary">{{ job.get_job_type_display }}</span>
+                    <p class="mt-2 small">{{ job.description|truncatewords:20 }}</p>
+                    <a href="{% url 'recruitment:job_detail' job.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </div>
+                <div class="card-footer bg-transparent text-muted small">Apply before {{ job.deadline }}</div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">No open vacancies at the moment. Please check back soon.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

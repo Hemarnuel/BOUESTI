@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+
+<h3 class="mb-4">Notifications</h3>
+
+<div class="list-group shadow-sm">
+    {% for note in notifications %}
+        <a href="{{ note.link|default:'#' }}" class="list-group-item list-group-item-action {% if not note.is_read %}bg-light{% endif %}">
+            <div class="d-flex justify-content-between">
+                <span>{{ note.message }}</span>
+                <small class="text-muted">{{ note.created_at|timesince }} ago</small>
+            </div>
+        </a>
+    {% empty %}
+        <div class="list-group-item text-muted">You have no notifications yet.</div>
+    {% endfor %}
+</div>
+
+{% endblock %}

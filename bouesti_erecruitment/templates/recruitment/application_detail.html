@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Application Detail{% endblock %}
+{% block content %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <h3>{{ application.job.title }}</h3>
+        <p class="text-muted">{{ application.job.department }} &middot; {{ application.job.location }}</p>
+        <span class="badge badge-status-{{ application.status }} mb-3">{{ application.get_status_display }}</span>
+
+        <hr>
+        <p><strong>Applicant:</strong> {{ application.applicant.get_full_name|default:application.applicant.username }}</p>
+        <p><strong>Applied On:</strong> {{ application.applied_at|date:"d M Y, H:i" }}</p>
+        <p><strong>CV:</strong> <a href="{{ application.cv.url }}" target="_blank">Download CV</a></p>
+        {% if application.cover_letter %}
+            <p><strong>Cover Letter:</strong></p>
+            <p style="white-space: pre-line;">{{ application.cover_letter }}</p>
+        {% endif %}
+
+        {% if application.interview %}
+            <hr>
+            <h5>Interview Details</h5>
+            <p><strong>Date/Time:</strong> {{ application.interview.scheduled_datetime|date:"d M Y, H:i" }}</p>
+            <p><strong>Mode:</strong> {{ application.interview.get_mode_display }}</p>
+            <p><strong>Venue/Link:</strong> {{ application.interview.location_or_link }}</p>
+            {% if application.interview.notes %}<p><strong>Notes:</strong> {{ application.interview.notes }}</p>{% endif %}
+        {% endif %}
+
+        <a href="{% url 'recruitment:dashboard' %}" class="btn btn-outline-secondary mt-3">Back to Dashboard</a>
+    </div>
+</div>
+
+{% endblock %}
